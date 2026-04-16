@@ -1,0 +1,20 @@
+apiVersion: v1alpha1
+kind: RegistryAuthConfig
+name: harbor.bde-dev.net
+username: ENC[AES256_GCM,data:yxISNpA=,iv:GOTZDZXftU8OwyX1VWwYiXrBvXOuvuWh763via3i3fE=,tag:X3MVYADuO6b+gnKAypn4VA==,type:str]
+password: ENC[AES256_GCM,data:kOfsUernQ+1bEIgCJTc=,iv:DYjmMg4itsoYQOv0nRS8P2ee6KeqpFKogI6WVjF/Npc=,tag:JAXrcKFfUxLeBPeA/lntHg==,type:str]
+sops:
+    age:
+        - recipient: age1xy78q6ugtatvc84nwathksyekn7hv6rfjjed8flpg6k45yt6nuls7mgh4v
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBrdE9QREN4endzVFZ6VFh2
+            WVA1NUJ4RGUyMzY0bUQxdjh4SEcwTUU5ZUJJClQrVXNnN1JnUFlxTFJ0ZEZQU21O
+            aHdLR1g1cWhEWVJ4eHdXQktmbmduZ2sKLS0tIE43Z2x4eDIzS3hsWlRPNkNzNWZp
+            bU1lRGlHUHA0Mk5mdnBuaWdLdWEvb2sK5B8QAjthxW0Y03T/OsUEifIuAQx7sltN
+            w/hr7N2vRSM/NniPBy9m3/UeBK6ObNsJzqtGX5S6u5sH+4UAPa0G1w==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-04-16T15:57:42Z"
+    mac: ENC[AES256_GCM,data:IL5eEIYgytqSwkMaBjSjn+Zdzl8BO4JEON25btgylKnKGGfkFGx+2thBedriidNjgdZwHzIqS3eSrbm/mqhu8P78vMehyVygPaPsWWhJNTCktn8UEWkMl4nMfj3Iplqr4vnVhQsIFtu4tL4ohf2+kUnyIy2D3ti5J1+d9ClZVx8=,iv:/isJkvpuRV8i7QRFNjy84yHdfjXQSEtk9YFkw6dR85I=,tag:YoPgnC3gGeFm8xdbS1MDAg==,type:str]
+    encrypted_regex: ^(username|password)$
+    version: 3.12.2

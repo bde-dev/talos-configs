@@ -1,0 +1,65 @@
+name: Talos Configs
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+env:
+  OMNI_ENDPOINT: ${{ secrets.OMNI_ENDPOINT }}
+  OMNI_SERVICE_ACCOUNT_KEY: ${{ secrets.OMNI_SERVICE_ACCOUNT_KEY }}
+  SOPS_AGE_KEY: ${{ secrets.AGE_SECRET_KEY }}
+
+jobs:
+  validate:
+    name: Validate Templates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: jdx/mise-action@v2
+
+      - name: Decrypt SOPS secrets and mask values
+        run: |
+          for f in $(find . -path './.sops.yaml' -prune -o -name '*.sops.yaml' -print); do
+            for val in $(sops -d "$f" | yq -r '.. | select(tag == "!!str") | .' 2>/dev/null); do
+              echo "::add-mask::$val"
+            done
+            sops -d -i "$f"
+          done
+
+      - name: Validate management-cluster
+        working-directory: clusters/management-cluster
+        run: omnictl cluster template validate -f template.yaml
+
+      - name: Validate private-cluster
+        working-directory: clusters/private-cluster
+        run: omnictl cluster template validate -f template.yaml
+
+  sync:
+    name: Sync to Omni
+    needs: validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: jdx/mise-action@v2
+
+      - name: Decrypt SOPS secrets and mask values
+        run: |
+          for f in $(find . -path './.sops.yaml' -prune -o -name '*.sops.yaml' -print); do
+            for val in $(sops -d "$f" | yq -r '.. | select(tag == "!!str") | .' 2>/dev/null); do
+              echo "::add-mask::$val"
+            done
+            sops -d -i "$f"
+          done
+
+      - name: Sync management-cluster
+        working-directory: clusters/management-cluster
+        run: omnictl cluster template sync -f template.yaml
+
+      - name: Sync private-cluster
+        working-directory: clusters/private-cluster
+        run: omnictl cluster template sync -f template.yaml
