@@ -1,0 +1,7 @@
+#!/bin/bash
+
+/usr/local/bin/mise trust /workspaces/$DEVPOD_WORKSPACE_ID/mise.toml && /usr/local/bin/mise install
+
+/usr/local/bin/mise exec helm -- helm repo add argocd https://argoproj.github.io/argo-helm
+
+/usr/local/bin/mise exec helm -- helm repo update

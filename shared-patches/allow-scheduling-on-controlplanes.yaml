@@ -1,0 +1,4 @@
+# Allow workload scheduling on control plane nodes
+# Single-node clusters require this to run any workloads
+cluster:
+  allowSchedulingOnControlPlanes: true

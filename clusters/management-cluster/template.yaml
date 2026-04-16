@@ -1,0 +1,33 @@
+kind: Cluster
+name: management-cluster
+kubernetes:
+  version: v1.35.0
+talos:
+  version: v1.12.2
+patches:
+  - file: ../../shared-patches/harbor-registry-mirrors.yaml
+    name: harbor-registry-mirrors
+    annotations:
+      description: Harbor proxy cache registry mirrors for all upstream registries
+  - file: patches/harbor-registry-auth.sops.yaml
+    name: harbor-registry-auth
+    annotations:
+      description: Harbor registry authentication credentials (SOPS encrypted)
+---
+kind: ControlPlane
+machines:
+  - 03000200-0400-0500-0006-000700080009
+patches:
+  - file: ../../shared-patches/allow-scheduling-on-controlplanes.yaml
+    name: allow-scheduling-on-controlplanes
+  - file: patches/l2-vip-config.yaml
+    name: l2-vip-config
+    annotations:
+      description: Control Plane VIP pinning network link
+---
+kind: Workers
+---
+kind: Machine
+name: 03000200-0400-0500-0006-000700080009
+systemExtensions:
+  - siderolabs/iscsi-tools

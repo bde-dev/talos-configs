@@ -1,0 +1,30 @@
+kind: Cluster
+name: private-cluster
+kubernetes:
+  version: v1.35.0
+talos:
+  version: v1.12.2
+patches:
+  - file: patches/l2-vip-config.yaml
+    name: l2-vip-config
+    annotations:
+      description: Control Plane VIP pinning network link
+  - file: patches/argocd-sa.yaml
+    name: argocd-sa
+    annotations:
+      description: ArgoCD ServiceAccount with cluster-admin for remote management
+---
+kind: ControlPlane
+machines:
+  - 0ac8680c-ee82-4425-a940-ac81af963418
+patches:
+  - file: ../../shared-patches/allow-scheduling-on-controlplanes.yaml
+    name: allow-scheduling-on-controlplanes
+---
+kind: Workers
+---
+kind: Machine
+name: 0ac8680c-ee82-4425-a940-ac81af963418
+systemExtensions:
+  - siderolabs/iscsi-tools
+  - siderolabs/util-linux-tools

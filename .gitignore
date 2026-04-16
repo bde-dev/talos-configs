@@ -1,0 +1,3 @@
+# Decrypted secret files (SOPS originals are safe to commit once encrypted)
+# Until SOPS is set up, prevent plaintext credential commits
+*.sops.yaml
