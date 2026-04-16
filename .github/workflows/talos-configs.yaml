@@ -22,8 +22,7 @@ jobs:
 
       - name: Decrypt SOPS secrets and mask values
         run: |
-          for f in $(find . -name '*.sops.yaml'); do
-            # Extract encrypted key values and register as masked
+          for f in $(find . -path './.sops.yaml' -prune -o -name '*.sops.yaml' -print); do
             for val in $(sops -d "$f" | yq -r '.. | select(tag == "!!str") | .' 2>/dev/null); do
               echo "::add-mask::$val"
             done
@@ -50,7 +49,7 @@ jobs:
 
       - name: Decrypt SOPS secrets and mask values
         run: |
-          for f in $(find . -name '*.sops.yaml'); do
+          for f in $(find . -path './.sops.yaml' -prune -o -name '*.sops.yaml' -print); do
             for val in $(sops -d "$f" | yq -r '.. | select(tag == "!!str") | .' 2>/dev/null); do
               echo "::add-mask::$val"
             done
