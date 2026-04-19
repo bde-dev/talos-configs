@@ -9,6 +9,10 @@ patches:
     name: l2-vip-config
     annotations:
       description: Control Plane VIP pinning network link
+  - file: ../../shared-patches/cilium-cni-prereqs.yaml
+    name: cilium-cni-prereqs
+    annotations:
+      description: Disable Flannel and kube-proxy for Cilium
   - file: patches/argocd-sa.yaml
     name: argocd-sa
     annotations:

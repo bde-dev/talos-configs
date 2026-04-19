@@ -9,6 +9,10 @@ patches:
     name: harbor-registry-mirrors
     annotations:
       description: Harbor proxy cache registry mirrors for all upstream registries
+  - file: ../../shared-patches/cilium-cni-prereqs.yaml
+    name: cilium-cni-prereqs
+    annotations:
+      description: Disable Flannel and kube-proxy for Cilium
   - file: patches/harbor-registry-auth.sops.yaml
     name: harbor-registry-auth
     annotations:
