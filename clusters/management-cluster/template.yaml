@@ -28,7 +28,7 @@ patches:
 ---
 kind: ControlPlane
 machines:
-  - 03000200-0400-0500-0006-000700080009
+  # - 03000200-0400-0500-0006-000700080009
 patches:
   - file: ../../shared-patches/allow-scheduling-on-controlplanes.yaml
     name: allow-scheduling-on-controlplanes
