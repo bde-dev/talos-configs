@@ -1,3 +1,5 @@
 # Decrypted secret files (keep encrypted .sops.yaml files)
 *.dec.yaml
 *.dec.yml
+
+.env

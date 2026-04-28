@@ -7,3 +7,9 @@ yq = "4.45.4"
 
 [settings]
 pin = true
+
+[env]
+_.file = ".env"
+
+[task_config]
+includes = ["tasks"]
