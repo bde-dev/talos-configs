@@ -17,8 +17,8 @@ patches:
     name: harbor-registry-auth
     annotations:
       description: Harbor registry authentication credentials (SOPS encrypted)
-  - file: ../../shared-patches/system-volume-config.yaml
-    name: system-volume-config
+  - file: ../../shared-patches/user-volume-config.yaml
+    name: user-volume-config
     annotations:
       description: UserVolumeConfig for local-path-provisioner partition on system disk
   - file: ../../shared-patches/local-path-provisioner.yaml
