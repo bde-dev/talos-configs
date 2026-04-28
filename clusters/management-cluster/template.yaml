@@ -31,8 +31,7 @@ patches:
       description: Local-path-provisioner deployment as default StorageClass
 ---
 kind: ControlPlane
-machines:
-  - 03000200-0400-0500-0006-000700080009
+machines: []
 patches:
   - file: ../../shared-patches/allow-scheduling-on-controlplanes.yaml
     name: allow-scheduling-on-controlplanes
@@ -42,8 +41,3 @@ patches:
       description: Control Plane VIP pinning network link
 ---
 kind: Workers
----
-kind: Machine
-name: 03000200-0400-0500-0006-000700080009
-systemExtensions:
-  - siderolabs/iscsi-tools
