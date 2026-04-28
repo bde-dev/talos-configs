@@ -38,8 +38,8 @@ patches:
       description: Control Plane VIP pinning network link
 ---
 kind: Workers
----
-kind: Machine
-name: 03000200-0400-0500-0006-000700080009
-systemExtensions:
-  - siderolabs/iscsi-tools
+# ---
+# kind: Machine
+# name: 03000200-0400-0500-0006-000700080009
+# systemExtensions:
+#   - siderolabs/iscsi-tools
