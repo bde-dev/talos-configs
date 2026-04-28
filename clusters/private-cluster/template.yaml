@@ -17,8 +17,8 @@ patches:
     name: argocd-sa
     annotations:
       description: ArgoCD ServiceAccount with cluster-admin for remote management
-  - file: ../../shared-patches/system-volume-config.yaml
-    name: system-volume-config
+  - file: ../../shared-patches/user-volume-config.yaml
+    name: user-volume-config
     annotations:
       description: UserVolumeConfig for local-path-provisioner partition on system disk
   - file: ../../shared-patches/local-path-provisioner.yaml
