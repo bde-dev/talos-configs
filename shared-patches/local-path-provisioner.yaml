@@ -23,7 +23,7 @@ cluster:
         rules:
           - apiGroups: [""]
             resources: ["nodes", "persistentvolumeclaims", "configmaps", "pods", "pods/log"]
-            verbs: ["get", "list", "watch"]
+            verbs: ["get", "list", "watch", "create", "delete"]
           - apiGroups: [""]
             resources: ["persistentvolumes", "endpoints"]
             verbs: ["get", "list", "watch", "create", "patch", "update", "delete"]
