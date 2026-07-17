@@ -1,8 +1,11 @@
 [tools]
 age = "1.3.1"
+azure-cli = "2.82.0"
 omnictl = "1.9.2"
-talosctl = "1.13.6"
+python = "3.14.2"
 sops = "3.12.2"
+talosctl = "1.13.6"
+uv = "0.9.28"
 yq = "4.45.4"
 
 [settings]
@@ -10,6 +13,8 @@ pin = true
 
 [env]
 _.file = ".env"
+AZURE_TENANT_ID = "dd114501-3212-46b0-9b66-2f8e0bf94f22"
+AKV_VAULT_NAME = "bde-dev-kv-homelab"
 
 [task_config]
 includes = ["tasks"]
