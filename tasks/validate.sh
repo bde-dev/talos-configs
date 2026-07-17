@@ -27,7 +27,7 @@ for dir in clusters/*/; do
   cluster=$(basename "$dir")
   echo ""
   echo "═══ Validating $cluster ═══"
-  if (cd "$dir" && omnictl cluster template validate -f template.yaml); then
+  if (cd "$dir" && omnictl cluster template validate -f template.yaml --allowed-dir ../..); then
     echo "✅ $cluster is valid"
   else
     echo "❌ $cluster has errors"

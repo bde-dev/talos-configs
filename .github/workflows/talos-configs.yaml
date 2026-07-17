@@ -31,11 +31,11 @@ jobs:
 
       - name: Validate management-cluster
         working-directory: clusters/management-cluster
-        run: omnictl cluster template validate -f template.yaml
+        run: omnictl cluster template validate -f template.yaml --allowed-dir ../..
 
       - name: Validate private-cluster
         working-directory: clusters/private-cluster
-        run: omnictl cluster template validate -f template.yaml
+        run: omnictl cluster template validate -f template.yaml --allowed-dir ../..
 
   sync:
     name: Sync to Omni
@@ -58,8 +58,8 @@ jobs:
 
       - name: Sync management-cluster
         working-directory: clusters/management-cluster
-        run: omnictl cluster template sync -f template.yaml
+        run: omnictl cluster template sync -f template.yaml --allowed-dir ../..
 
       - name: Sync private-cluster
         working-directory: clusters/private-cluster
-        run: omnictl cluster template sync -f template.yaml
+        run: omnictl cluster template sync -f template.yaml --allowed-dir ../..
