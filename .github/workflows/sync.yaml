@@ -60,3 +60,30 @@ jobs:
       - name: Sync private-cluster
         working-directory: clusters/private-cluster
         run: omnictl cluster template sync -f template.yaml --allowed-dir ../..
+
+  wait:
+    name: Wait for clusters ready
+    needs: sync
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: jdx/mise-action@v2
+
+      - name: Decrypt SOPS secrets and mask values
+        run: |
+          for f in $(find . -path './.sops.yaml' -prune -o -name '*.sops.yaml' -print); do
+            for val in $(sops -d "$f" | yq -r '.. | select(tag == "!!str") | .' 2>/dev/null); do
+              echo "::add-mask::$val"
+            done
+            sops -d -i "$f"
+          done
+
+      - name: Wait for management-cluster
+        working-directory: clusters/management-cluster
+        run: omnictl cluster template status -f template.yaml --allowed-dir ../.. --wait 15m
+
+      - name: Wait for private-cluster
+        working-directory: clusters/private-cluster
+        run: omnictl cluster template status -f template.yaml --allowed-dir ../.. --wait 15m
