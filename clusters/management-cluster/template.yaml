@@ -3,7 +3,7 @@ name: management-cluster
 kubernetes:
   version: v1.35.0
 talos:
-  version: v1.12.2
+  version: v1.12.10
 patches:
   - file: ../../shared-patches/harbor-registry-mirrors.yaml
     name: harbor-registry-mirrors
