@@ -1,0 +1,38 @@
+name: Diff
+
+on:
+  pull_request:
+    branches: [main]
+
+env:
+  OMNI_ENDPOINT: ${{ secrets.OMNI_ENDPOINT }}
+  OMNI_SERVICE_ACCOUNT_KEY: ${{ secrets.OMNI_SERVICE_ACCOUNT_KEY }}
+  SOPS_AGE_KEY: ${{ secrets.AGE_SECRET_KEY }}
+
+jobs:
+  diff:
+    name: Diff Templates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: jdx/mise-action@v2
+
+      - name: Decrypt SOPS secrets and mask values
+        run: |
+          for f in $(find . -path './.sops.yaml' -prune -o -name '*.sops.yaml' -print); do
+            for val in $(sops -d "$f" | yq -r '.. | select(tag == "!!str") | .' 2>/dev/null); do
+              echo "::add-mask::$val"
+            done
+            sops -d -i "$f"
+          done
+
+      - name: Diff management-cluster
+        working-directory: clusters/management-cluster
+        continue-on-error: true
+        run: omnictl cluster template diff -f template.yaml --allowed-dir ../..
+
+      - name: Diff private-cluster
+        working-directory: clusters/private-cluster
+        continue-on-error: true
+        run: omnictl cluster template diff -f template.yaml --allowed-dir ../..
