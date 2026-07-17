@@ -4,10 +4,10 @@ Declarative configuration for my Talos Linux clusters, managed through [Omni](ht
 
 ## Clusters
 
-| Cluster | Control-plane machine | Node IP | Talos | Kubernetes | Notable |
-|---|---|---|---|---|---|
-| `management-cluster` | `03000200-…-0009` | 192.168.0.205 | v1.12.10 | v1.35.0 | Harbor registry mirrors + auth, control-plane VIP 192.168.0.30 |
-| `private-cluster` | `0ac8680c-…-3418` | 192.168.0.204 | v1.12.10 | v1.35.0 | ArgoCD cluster-admin ServiceAccount for remote management |
+| Cluster | Control-plane machine | Node IP | Notable |
+|---|---|---|---|
+| `management-cluster` | `03000200-…-0009` | 192.168.0.205 | Harbor registry mirrors + auth, control-plane VIP 192.168.0.30 |
+| `private-cluster` | `0ac8680c-…-3418` | 192.168.0.204 | ArgoCD cluster-admin ServiceAccount for remote management |
 
 Both are single-node control planes (`allowSchedulingOnControlPlanes: true`), Cilium CNI (Flannel + kube-proxy disabled), with local-path-provisioner as the default StorageClass.
 
