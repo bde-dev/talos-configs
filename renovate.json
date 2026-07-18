@@ -1,0 +1,39 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "separateMinorPatch": true,
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/clusters/.+/template\\.ya?ml$/"],
+      "matchStrings": ["talos:\\s+version:\\s+(?<currentValue>\\S+)"],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "siderolabs/talos"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/clusters/.+/template\\.ya?ml$/"],
+      "matchStrings": ["kubernetes:\\s+version:\\s+(?<currentValue>\\S+)"],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "kubernetes/kubernetes"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Cap Kubernetes to what Talos 1.13 supports; raise this when the cluster Talos version moves to 1.14+",
+      "matchDatasources": ["github-releases"],
+      "matchPackageNames": ["kubernetes/kubernetes"],
+      "allowedVersions": "<1.37"
+    },
+    {
+      "description": "Label cluster template version bumps",
+      "matchFileNames": ["clusters/**"],
+      "addLabels": ["cluster-version"]
+    },
+    {
+      "description": "Label mise.toml toolchain bumps (omnictl, talosctl, azure-cli, ...)",
+      "matchManagers": ["mise"],
+      "addLabels": ["mise"]
+    }
+  ]
+}
