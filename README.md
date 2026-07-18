@@ -9,7 +9,7 @@ Declarative configuration for my Talos Linux clusters, managed through [Omni](ht
 | `management-cluster` | `03000200-…-0009` | 192.168.0.205 | Harbor registry mirrors + auth, control-plane VIP 192.168.0.30 |
 | `private-cluster` | `0ac8680c-…-3418` | 192.168.0.204 | ArgoCD cluster-admin ServiceAccount for remote management |
 
-Both are single-node control planes (`allowSchedulingOnControlPlanes: true`), Cilium CNI (Flannel + kube-proxy disabled), with local-path-provisioner as the default StorageClass.
+Both are single-node control planes (`allowSchedulingOnControlPlanes: true`), Cilium CNI (Flannel + kube-proxy disabled), with local-path-provisioner as the default StorageClass. Talos and Kubernetes versions are pinned per cluster in `clusters/<name>/template.yaml`.
 
 ## Layout
 
@@ -24,20 +24,22 @@ scripts/setup         # devcontainer postCreate: mise install + argo helm repo
 .githooks/pre-push    # runs `mise run validate` before every push
 .github/workflows/    # validate.yaml, diff.yaml, sync.yaml (see CI below)
 .sops.yaml            # SOPS/age rules (encrypts username/password keys)
-mise.toml             # pinned toolchain + non-secret Azure config
+mise.toml             # pinned toolchain + non-secret Azure config (tenant, vault, client id)
 omniconfig.yaml       # omnictl context (Omni endpoint + identity) — contains no secret
-.env.example          # template for the two Azure service-principal values
+renovate.json         # version tracking for the templates (dormant until activated)
 ```
 
 ## Getting a fresh clone working
 
-The devpod's postCreate installs the toolchain. Secrets live in Azure Key Vault (`bde-dev-kv-homelab`) and are reached with an Azure service principal; the one value you supply by hand is that principal's client secret.
+The devpod's postCreate installs the toolchain. Secrets live in Azure Key Vault (`bde-dev-kv-homelab`), reached with an Azure service principal whose non-secret ids (tenant, vault, client id) are in `mise.toml [env]`. The one value you supply by hand is the principal's **client secret** — as a shell `export` or a line in `.env`.
 
-1. `cp .env.example .env` and fill `CLIENT_ID` + `CLIENT_SECRET` (only the secret is sensitive; tenant and vault are set in `mise.toml`).
-2. `mise run fresh-clone` — pulls `SOPS_AGE_KEY`, `OMNI_ENDPOINT`, `OMNI_SERVICE_ACCOUNT_KEY` from Key Vault into `.env`, then fetches a talosconfig per cluster.
-3. `mise run validate` — confirms decryption and the templates.
+```bash
+mise run bootstrap-env      # ensure .env holds the keys it needs (skips anything already set)
+export CLIENT_SECRET=…      # or add CLIENT_SECRET=… to .env
+mise run fresh-clone        # pull secrets -> verify sops -> validate -> gather configs
+```
 
-`fresh-clone` chains `bootstrap-env` and `gather-configs`; see `tasks/README.md`. `sops-init` is the fallback when Key Vault isn't available.
+See `tasks/README.md` for the individual tasks.
 
 ## How changes reach the clusters
 
@@ -66,14 +68,14 @@ An upgrade is a template change, not a manual `talosctl upgrade` — Omni reconc
 2. `mise run validate`.
 3. PR (the Diff preview shows the version change) → merge → Sync applies it and waits for ready.
 
-Both clusters are single-node control planes, so an upgrade reboots the node with a brief outage. `omnictl get clusters` shows the current versions.
+Both clusters are single-node control planes, so a Talos upgrade reboots the node with a brief outage; a Kubernetes upgrade restarts the control-plane pods and kubelet without an OS reboot. Kubernetes moves one minor at a time and is capped by the running Talos version's supported range. `omnictl get clusters` shows the current versions.
 
 ## Toolchain & auth
 
 The devpod (`.devcontainer`) installs the pinned `mise` tools: `omnictl`, `talosctl`, `sops` + `age`, `yq`, and `azure-cli` (with `python` + `uv`, which back the Azure CLI install).
 
-- **Secrets** live in Azure Key Vault `bde-dev-kv-homelab` and reach `.env` via `mise run bootstrap-env` (service-principal login). `.env` is gitignored and `mise` sources it into every task.
-- **omnictl** authenticates with `OMNI_ENDPOINT` + `OMNI_SERVICE_ACCOUNT_KEY` from `.env`; CI uses the same values from GitHub secrets. The `omniconfig.yaml` interactive login is the fallback.
+- **Secrets** live in Azure Key Vault `bde-dev-kv-homelab`. `mise run pull-secrets` logs in with the service principal and writes `SOPS_AGE_KEY` / `OMNI_ENDPOINT` / `OMNI_SERVICE_ACCOUNT_KEY` into `.env`. `.env` is gitignored and mise sources it into every task.
+- **omnictl** authenticates with `OMNI_ENDPOINT` + `OMNI_SERVICE_ACCOUNT_KEY` from `.env`; CI uses the same values from GitHub secrets.
 - **sops** decrypts with `SOPS_AGE_KEY` from `.env`, matched to the recipient in `.sops.yaml`.
 
 ## Local cluster access

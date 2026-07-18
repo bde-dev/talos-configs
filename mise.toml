@@ -15,6 +15,7 @@ pin = true
 _.file = ".env"
 AZURE_TENANT_ID = "dd114501-3212-46b0-9b66-2f8e0bf94f22"
 AKV_VAULT_NAME = "bde-dev-kv-homelab"
+CLIENT_ID = "207b037b-896e-4c6e-ad2e-1671ee0b34ea"
 
 [task_config]
 includes = ["tasks"]

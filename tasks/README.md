@@ -4,7 +4,7 @@
 
 | Task | What it does |
 |---|---|
-| `bootstrap-env` | Ensure `.env` has every required key (empty if unset) |
+| `bootstrap-env` | Ensure `.env` holds each required key that isn't already provided |
 | `pull-secrets` | Pull the SOPS + Omni secrets from Azure Key Vault into `.env` |
 | `sops-init` | Verify the SOPS age key in `.env` decrypts this repo |
 | `validate` | Validate every cluster template against Omni |
@@ -16,16 +16,18 @@ Each task is atomic; `fresh-clone` chains them for a clean checkout.
 ## Getting a fresh clone working
 
 ```bash
-mise run bootstrap-env     # scaffold .env with all keys (empty)
-# fill CLIENT_ID + CLIENT_SECRET in .env (Azure SP, from the homelab azure-creds secret)
+mise run bootstrap-env     # ensure .env holds the keys it needs (skips anything already set)
+export CLIENT_SECRET=…     # or add CLIENT_SECRET=… to .env
 mise run fresh-clone       # pull secrets -> verify sops -> validate -> gather configs
 ```
 
-`.env` holds two kinds of value: the Azure service-principal `CLIENT_ID` + `CLIENT_SECRET` you fill by hand (only the secret is sensitive; tenant and vault are non-secret in `mise.toml [env]`), and `SOPS_AGE_KEY` / `OMNI_ENDPOINT` / `OMNI_SERVICE_ACCOUNT_KEY`, which `pull-secrets` fills from Key Vault. `.env` is gitignored and mise sources it into every task.
+The Azure service principal's non-secret ids — tenant, vault, and `CLIENT_ID` — live in `mise.toml [env]`. The one value you supply is the **client secret**, via a shell `export` (nothing lands in `.env`) or a `.env` line. `pull-secrets` then fills `SOPS_AGE_KEY` / `OMNI_ENDPOINT` / `OMNI_SERVICE_ACCOUNT_KEY` from Key Vault. `.env` is gitignored and mise sources it into every task.
+
+Note: mise's `.env` overrides a shell export of the same key — even an empty `KEY=` wins — so `export` only takes effect when the key is *absent* from `.env`. That is why `bootstrap-env` never scaffolds a key you have already exported.
 
 ## `bootstrap-env` — `bootstrap-env.sh`
 
-The single `.env` scaffold: creates `.env` if absent and appends any missing key as an empty `KEY=` line. Idempotent — safe to re-run, and it never overwrites a value that is already set.
+The single `.env` scaffold. For each key it needs (`CLIENT_SECRET`, `SOPS_AGE_KEY`, `OMNI_ENDPOINT`, `OMNI_SERVICE_ACCOUNT_KEY`) it appends an empty `KEY=` line **only if that key isn't already provided** — neither present in `.env` nor set in the shell environment. So a value you `export` flows through untouched, and a value you haven't provided gets a paste target. Idempotent; never overwrites a value that is set.
 
 ```bash
 mise run bootstrap-env
@@ -33,7 +35,7 @@ mise run bootstrap-env
 
 ## `pull-secrets` — `pull-secrets.sh`
 
-Logs in to Azure with the service principal and pulls the repo's secrets from Key Vault `bde-dev-kv-homelab` into `.env`, so the only values you paste by hand are the SP `CLIENT_ID` / `CLIENT_SECRET`.
+Logs in to Azure with the service principal and pulls the repo's secrets from Key Vault `bde-dev-kv-homelab` into `.env`. `CLIENT_ID` comes from `mise.toml [env]`; `CLIENT_SECRET` from your shell or `.env`.
 
 | Key Vault secret | `.env` variable |
 |---|---|
@@ -45,7 +47,7 @@ Logs in to Azure with the service principal and pulls the repo's secrets from Ke
 mise run pull-secrets
 ```
 
-**Needs:** `azure-cli` (pinned in `mise.toml`) and `CLIENT_ID` / `CLIENT_SECRET` in `.env`. Idempotent — re-run to refresh.
+**Needs:** `azure-cli` (pinned in `mise.toml`) and `CLIENT_SECRET` (export or `.env`). Idempotent — re-run to refresh.
 
 ## `sops-init` — `sops-init.sh`
 
@@ -83,7 +85,7 @@ talosctl version           # hits the default node — no --nodes needed
 
 ## `fresh-clone` — `fresh-clone.sh`
 
-Runs the whole chain in order — `bootstrap-env` → `pull-secrets` → `sops-init` → `validate` → `gather-configs` — for a freshly cloned repo or rebuilt devpod. Fill `CLIENT_ID` / `CLIENT_SECRET` first; the rest flows from there.
+Runs the whole chain in order — `bootstrap-env` → `pull-secrets` → `sops-init` → `validate` → `gather-configs` — for a freshly cloned repo or rebuilt devpod. Provide `CLIENT_SECRET` first; the rest flows from there.
 
 ```bash
 mise run fresh-clone
