@@ -1,4 +1,5 @@
 {
+  "name": "talos-configs",
   "build": {
     "context": "..",
     "dockerfile": "Dockerfile"
