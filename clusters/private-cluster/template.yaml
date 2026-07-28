@@ -29,6 +29,15 @@ patches:
     name: local-path-provisioner
     annotations:
       description: Local-path-provisioner deployment as default StorageClass
+  - file: patches/pod-cidr-subnets.yaml
+    name: pod-cidr-subnets
+    annotations:
+      description: Detatch pod CIDR range for Cilium clustermesh
+  - file: patches/service-cidr-subnets.yaml
+    name: service-cidr-subnets
+    annotations:
+      description: Detatch service CIDR range for Cilium clustermesh
+
 ---
 kind: ControlPlane
 machines:
