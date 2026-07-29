@@ -53,3 +53,8 @@ name: 0ac8680c-ee82-4425-a940-ac81af963418
 systemExtensions:
   - siderolabs/iscsi-tools
   - siderolabs/util-linux-tools
+patches:
+  - file: patches/hostname-priv-cp-01.yaml
+    name: hostname-priv-cp-01
+    annotations:
+      description: set control-plane hostname to priv-cp-01

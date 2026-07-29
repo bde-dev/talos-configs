@@ -36,3 +36,8 @@ jobs:
         working-directory: clusters/private-cluster
         continue-on-error: true
         run: omnictl cluster template diff -f template.yaml --allowed-dir ../..
+
+      - name: Diff public-cluster
+        working-directory: clusters/public-cluster
+        continue-on-error: true
+        run: omnictl cluster template diff -f template.yaml --allowed-dir ../..

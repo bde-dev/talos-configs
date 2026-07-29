@@ -1,0 +1,4 @@
+apiVersion: v1alpha1
+kind: HostnameConfig
+hostname: pub-cp-01
+auto: off
