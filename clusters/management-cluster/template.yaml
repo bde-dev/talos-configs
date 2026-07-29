@@ -58,13 +58,18 @@ kind: Machine
 name: 03000200-0400-0500-0006-000700080009
 systemExtensions:
   - siderolabs/iscsi-tools
+patches:
+  - file: patches/hostname-mgmt-cp-01.yaml
+    name: hostname-mgmt-cp-01
+    annotations:
+      description: set control-plane hostname to mgmt-cp-01
 ---
 kind: Machine
 name: 67972d80-edb3-4e50-88b5-c806192375e6
 systemExtensions:
   - siderolabs/iscsi-tools
 patches:
-  - file: patches/mc-wk-01-hostname.yaml
-    name: mc-wk-01-hostname
+  - file: patches/hostname-mgmt-wk-01.yaml
+    name: hostname-mgmt-wk-01
     annotations:
-      description: set worker hostname to mc-wk-01
+      description: set worker hostname to mgmt-wk-01

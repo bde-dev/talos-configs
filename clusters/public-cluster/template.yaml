@@ -1,0 +1,59 @@
+kind: Cluster
+name: public-cluster
+kubernetes:
+  version: v1.36.2
+talos:
+  version: v1.13.6
+patches:
+  - file: patches/l2-vip-config.yaml
+    name: l2-vip-config
+    annotations:
+      description: Control Plane VIP pinning network link
+  - file: ../../shared-patches/cilium-cni-prereqs.yaml
+    name: cilium-cni-prereqs
+    annotations:
+      description: Disable Flannel and kube-proxy for Cilium
+  - file: patches/argocd-sa.yaml
+    name: argocd-sa
+    annotations:
+      description: ArgoCD ServiceAccount with cluster-admin for remote management
+  - file: ../../shared-patches/system-volume-config.yaml
+    name: system-volume-config
+    annotations:
+      description: Cap EPHEMERAL partition to leave room for user volumes
+  - file: ../../shared-patches/user-volume-config.yaml
+    name: user-volume-config
+    annotations:
+      description: UserVolumeConfig for local-path-provisioner partition on system disk
+  - file: ../../shared-patches/local-path-provisioner.yaml
+    name: local-path-provisioner
+    annotations:
+      description: Local-path-provisioner deployment as default StorageClass
+  - file: patches/pod-cidr-subnets.yaml
+    name: pod-cidr-subnets
+    annotations:
+      description: Detatch pod CIDR range for Cilium clustermesh
+  - file: patches/service-cidr-subnets.yaml
+    name: service-cidr-subnets
+    annotations:
+      description: Detatch service CIDR range for Cilium clustermesh
+
+---
+kind: ControlPlane
+machines:
+  - 86ebeb1e-6e06-4f48-a575-31c35cb34e90
+patches:
+  - file: ../../shared-patches/allow-scheduling-on-controlplanes.yaml
+    name: allow-scheduling-on-controlplanes
+---
+kind: Workers
+---
+kind: Machine
+name: 86ebeb1e-6e06-4f48-a575-31c35cb34e90
+systemExtensions:
+  - siderolabs/iscsi-tools
+patches:
+  - file: patches/hostname-pub-cp-01.yaml
+    name: hostname-pub-cp-01
+    annotations:
+      description: set control-plane hostname to pub-cp-01
