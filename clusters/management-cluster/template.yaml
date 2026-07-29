@@ -52,7 +52,7 @@ patches:
 ---
 kind: Workers
 machines:
-  - 67972d80-edb3-4e50-88b5-c806192375e6
+  - 84a739e0-85cc-4ec5-8d9a-160b9c234334
 ---
 kind: Machine
 name: 03000200-0400-0500-0006-000700080009
@@ -65,7 +65,7 @@ patches:
       description: set control-plane hostname to mgmt-cp-01
 ---
 kind: Machine
-name: 67972d80-edb3-4e50-88b5-c806192375e6
+name: 84a739e0-85cc-4ec5-8d9a-160b9c234334
 systemExtensions:
   - siderolabs/iscsi-tools
 patches:
