@@ -73,3 +73,7 @@ patches:
     name: hostname-mgmt-wk-01
     annotations:
       description: set worker hostname to mgmt-wk-01
+  - file: patches/ephemeral-cap-mgmt-wk-01.yaml
+    name: ephemeral-cap-mgmt-wk-01
+    annotations:
+      description: Cap EPHEMERAL to 35GB so the 20GB local-path user volume fits on the 64GB disk
