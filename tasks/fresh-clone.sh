@@ -2,6 +2,8 @@
 #MISE description="Full bootstrap: ensure .env keys, pull secrets, verify sops, validate, gather configs"
 set -euo pipefail
 
+git config core.hooksPath .githooks
+
 mise run bootstrap-env
 echo ""
 mise run pull-secrets
