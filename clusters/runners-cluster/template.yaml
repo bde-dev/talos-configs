@@ -1,0 +1,92 @@
+kind: Cluster
+name: runners-cluster
+kubernetes:
+  version: v1.36.2
+talos:
+  version: v1.13.6
+patches:
+  - file: ../../shared-patches/harbor-registry-mirrors.yaml
+    name: harbor-registry-mirrors
+    annotations:
+      description: Harbor proxy cache registry mirrors for all upstream registries
+  - file: ../../shared-patches/cilium-cni-prereqs.yaml
+    name: cilium-cni-prereqs
+    annotations:
+      description: Disable Flannel and kube-proxy for Cilium
+  - file: patches/argocd-sa.yaml
+    name: argocd-sa
+    annotations:
+      description: ArgoCD ServiceAccount with cluster-admin for remote management
+  - file: ../../shared-patches/system-volume-config.yaml
+    name: system-volume-config
+    annotations:
+      description: Cap EPHEMERAL partition to leave room for user volumes
+  - file: ../../shared-patches/user-volume-config.yaml
+    name: user-volume-config
+    annotations:
+      description: UserVolumeConfig for local-path-provisioner partition on system disk
+  - file: ../../shared-patches/local-path-provisioner.yaml
+    name: local-path-provisioner
+    annotations:
+      description: Local-path-provisioner deployment as default StorageClass
+  - file: patches/pod-cidr-subnets.yaml
+    name: pod-cidr-subnets
+    annotations:
+      description: Detatch pod CIDR range for Cilium clustermesh
+  - file: patches/service-cidr-subnets.yaml
+    name: service-cidr-subnets
+    annotations:
+      description: Detatch service CIDR range for Cilium clustermesh
+
+---
+kind: ControlPlane
+machines:
+  - TODO-UUID-run-cp-01
+patches:
+  - file: ../../shared-patches/allow-scheduling-on-controlplanes.yaml
+    name: allow-scheduling-on-controlplanes
+  - file: patches/l2-vip-config.yaml
+    name: l2-vip-config
+    annotations:
+      description: Control Plane VIP pinning network link
+---
+kind: Workers
+machines:
+  - TODO-UUID-run-wk-01
+  - TODO-UUID-run-wk-02
+---
+kind: Machine
+name: TODO-UUID-run-cp-01
+install:
+  disk: /dev/nvme0n1
+systemExtensions:
+  - siderolabs/iscsi-tools
+patches:
+  - file: patches/hostname-run-cp-01.yaml
+    name: hostname-run-cp-01
+    annotations:
+      description: set control-plane hostname to run-cp-01
+---
+kind: Machine
+name: TODO-UUID-run-wk-01
+install:
+  disk: /dev/nvme0n1
+systemExtensions:
+  - siderolabs/iscsi-tools
+patches:
+  - file: patches/hostname-run-wk-01.yaml
+    name: hostname-run-wk-01
+    annotations:
+      description: set worker hostname to run-wk-01
+---
+kind: Machine
+name: TODO-UUID-run-wk-02
+install:
+  disk: /dev/nvme0n1
+systemExtensions:
+  - siderolabs/iscsi-tools
+patches:
+  - file: patches/hostname-run-wk-02.yaml
+    name: hostname-run-wk-02
+    annotations:
+      description: set worker hostname to run-wk-02

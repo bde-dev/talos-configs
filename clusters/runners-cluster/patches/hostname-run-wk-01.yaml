@@ -1,0 +1,4 @@
+apiVersion: v1alpha1
+kind: HostnameConfig
+hostname: run-wk-01
+auto: off
