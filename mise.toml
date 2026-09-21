@@ -6,7 +6,7 @@ python = "3.14.7"
 sops = "3.12.2"
 talosctl = "1.13.6"
 uv = "0.9.30"
-yq = "4.45.4"
+yq = "4.53.6"
 
 [settings]
 pin = true
