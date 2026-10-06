@@ -5,7 +5,7 @@ omnictl = "1.12.3"
 python = "3.14.8"
 sops = "3.13.3"
 talosctl = "1.13.11"
-uv = "0.12.20"
+uv = "0.12.23"
 yq = "4.53.6"
 
 [settings]
