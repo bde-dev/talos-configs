@@ -4,12 +4,13 @@ Declarative configuration for my Talos Linux clusters, managed through [Omni](ht
 
 ## Clusters
 
-| Cluster | Control-plane machine | Node IP | Notable |
-|---|---|---|---|
-| `management-cluster` | `03000200-…-0009` | 192.168.0.205 | Harbor registry mirrors + auth, control-plane VIP 192.168.0.30 |
-| `private-cluster` | `0ac8680c-…-3418` | 192.168.0.204 | ArgoCD cluster-admin ServiceAccount for remote management |
+| Cluster | Nodes | Notable |
+|---|---|---|
+| `management-cluster` | `mgmt-cp-01` (control plane), `mgmt-wk-01` (worker) | Harbor registry mirrors + auth; the worker caps its EPHEMERAL partition so a local-path user volume fits on its disk |
+| `private-cluster` | `priv-cp-01` (control plane) | ArgoCD cluster-admin ServiceAccount for remote management |
+| `public-cluster` | `pub-cp-01` (control plane) | ArgoCD cluster-admin ServiceAccount for remote management |
 
-Both are single-node control planes (`allowSchedulingOnControlPlanes: true`), Cilium CNI (Flannel + kube-proxy disabled), with local-path-provisioner as the default StorageClass. Talos and Kubernetes versions are pinned per cluster in `clusters/<name>/template.yaml`.
+Every cluster has a single control-plane node (`allowSchedulingOnControlPlanes: true`) with a Layer 2 VIP in front of it, Cilium CNI (Flannel + kube-proxy disabled), and local-path-provisioner as the default StorageClass. Pod and service CIDRs are distinct per cluster so Cilium ClusterMesh can join them. Machine IDs, VIPs, and the pinned Talos and Kubernetes versions live in `clusters/<name>/template.yaml` and its patches; node IPs come from Omni (`mise run gather-configs`).
 
 ## Layout
 
@@ -25,8 +26,7 @@ scripts/setup         # devcontainer postCreate: mise install + argo helm repo
 .github/workflows/    # validate.yaml, diff.yaml, sync.yaml (see CI below)
 .sops.yaml            # SOPS/age rules (encrypts username/password keys)
 mise.toml             # pinned toolchain + non-secret Azure config (tenant, vault, client id)
-omniconfig.yaml       # omnictl context (Omni endpoint + identity) — contains no secret
-renovate.json         # version tracking for the templates (dormant until activated)
+renovate.json         # Renovate: Talos + Kubernetes versions in the templates, tools in mise.toml
 ```
 
 ## Getting a fresh clone working
@@ -54,7 +54,7 @@ See `tasks/README.md` for the individual tasks.
 
 Three workflows, split by trigger:
 
-- **`validate.yaml`** — push to any branch. Offline schema check (`omnictl cluster template validate`) of both templates.
+- **`validate.yaml`** — push to any branch. Offline schema check (`omnictl cluster template validate`) of every cluster template.
 - **`diff.yaml`** — pull request. `omnictl cluster template diff` previews what a sync would change, so the effect is visible at review time. It is informational and applies nothing.
 - **`sync.yaml`** — push to `main`. Runs `validate` → `sync` (`omnictl cluster template sync`) → `wait` (`omnictl cluster template status --wait 15m`, with a 20-minute job backstop), so a merge applies the templates and blocks until Omni finishes the rollout.
 
@@ -64,11 +64,11 @@ Template `file:` includes carry `--allowed-dir ../..` because omnictl confines a
 
 An upgrade is a template change, not a manual `talosctl upgrade` — Omni reconciles from the version fields:
 
-1. Bump `talos.version` / `kubernetes.version` in each `clusters/<name>/template.yaml`.
+1. Bump `talos.version` / `kubernetes.version` in each `clusters/<name>/template.yaml` (Renovate opens these PRs; Kubernetes is capped in `renovate.json` to the running Talos version's supported range).
 2. `mise run validate`.
 3. PR (the Diff preview shows the version change) → merge → Sync applies it and waits for ready.
 
-Both clusters are single-node control planes, so a Talos upgrade reboots the node with a brief outage; a Kubernetes upgrade restarts the control-plane pods and kubelet without an OS reboot. Kubernetes moves one minor at a time and is capped by the running Talos version's supported range. `omnictl get clusters` shows the current versions.
+Each cluster has a single control-plane node, so a Talos upgrade reboots it with a brief outage; a Kubernetes upgrade restarts the control-plane pods and kubelet without an OS reboot. Kubernetes moves one minor at a time and is capped by the running Talos version's supported range. `omnictl get clusters` shows the current versions.
 
 ## Toolchain & auth
 
