@@ -4,7 +4,7 @@ azure-cli = "2.91.0"
 omnictl = "1.12.4"
 python = "3.15.0"
 sops = "3.13.3"
-talosctl = "1.13.11"
+talosctl = "1.14.4"
 uv = "0.12.24"
 yq = "4.53.6"
 
